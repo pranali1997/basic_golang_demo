@@ -1,23 +1,41 @@
 package app
 
 import (
+	"handsongo/pkg/config"
+	"handsongo/pkg/reporters"
 	"handsongo/pkg/router"
 	"handsongo/pkg/server"
-	"handsongo/pkg/config"
+	"io"
 	"net/http"
-)
+	"os"
 
+	"go.uber.org/zap"
+)
 
 func initHTTPServer(configFile string) {
 	cfg := config.NewConfig(configFile)
-	rt := initRouter(cfg)
+	lgr := initLogger(cfg)
 
-	server.NewServer(cfg, rt).Start()
+	rt := initRouter(cfg, lgr)
+
+	server.NewServer(cfg, lgr, rt).Start()
 }
 
+func initRouter(cfg config.Config, lgr *zap.Logger) http.Handler {
 
+	return router.NewRouter(lgr)
+}
 
-func initRouter(cfg config.Config) http.Handler {
+func initLogger(cfg config.Config) *zap.Logger {
+	return reporters.NewLogger(
+		cfg.GetLogConfig().GetLevel(),
+		getWriters(cfg.GetLogFileConfig())...,
+	)
+}
 
-	return router.Router()
+func getWriters(cfg config.LogFileConfig) []io.Writer {
+	return []io.Writer{
+		os.Stdout,
+		reporters.NewExternalLogFile(cfg),
+	}
 }

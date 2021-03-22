@@ -20,6 +20,12 @@ func Hello(w http.ResponseWriter, req *http.Request) {
 	fmt.Fprintf(w, "hello\n")
 }
 
+func HelloError(w http.ResponseWriter, req *http.Request){
+	w.WriteHeader(500)
+	w.Write([]byte("internal error"))
+
+}
+
 func Headers(w http.ResponseWriter, req *http.Request) {
 
 	// This handler does something a little more

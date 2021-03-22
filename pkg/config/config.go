@@ -6,19 +6,30 @@ import (
 	"github.com/spf13/viper"
 )
 
-const (
-	bankService  = "BANK_SERVICE"
-	fraudService = "FRAUD_SERVICE"
-)
+// const (
+// 	bankService  = "BANK_SERVICE"
+// 	fraudService = "FRAUD_SERVICE"
+// )
 
 
 type Config struct {
 	
 	httpServerConfig HTTPServerConfig
+	logConfig        LogConfig
+	logFileConfig    LogFileConfig
+
 }
 
 func (config Config) GetHTTPServerConfig() HTTPServerConfig {
 	return config.httpServerConfig
+}
+
+func (config Config) GetLogConfig() LogConfig {
+	return config.logConfig
+}
+
+func (config Config) GetLogFileConfig() LogFileConfig {
+	return config.logFileConfig
 }
 
 func NewConfig(configFile string) Config {
@@ -34,5 +45,8 @@ func NewConfig(configFile string) Config {
 	return Config{
 		
 		httpServerConfig: newHTTPServerConfig(),
+		logConfig:        newLogConfig(),
+		logFileConfig:    newLogFileConfig(),
+
 	}
 }
