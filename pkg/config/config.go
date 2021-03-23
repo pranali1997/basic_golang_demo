@@ -13,11 +13,14 @@ import (
 
 
 type Config struct {
-	
+	dbConfig         DBConfig
 	httpServerConfig HTTPServerConfig
 	logConfig        LogConfig
 	logFileConfig    LogFileConfig
 
+}
+func (config Config) GetDBConfig() DBConfig {
+	return config.dbConfig
 }
 
 func (config Config) GetHTTPServerConfig() HTTPServerConfig {
@@ -47,6 +50,7 @@ func NewConfig(configFile string) Config {
 		httpServerConfig: newHTTPServerConfig(),
 		logConfig:        newLogConfig(),
 		logFileConfig:    newLogFileConfig(),
+		dbConfig:         NewDBConfig(),
 
 	}
 }

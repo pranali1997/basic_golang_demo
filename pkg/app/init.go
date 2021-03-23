@@ -2,10 +2,13 @@ package app
 
 import (
 	"handsongo/pkg/config"
+	"handsongo/pkg/db"
 	"handsongo/pkg/reporters"
 	"handsongo/pkg/router"
 	"handsongo/pkg/server"
+	"handsongo/pkg/user"
 	"io"
+	"log"
 	"net/http"
 	"os"
 
@@ -22,8 +25,29 @@ func initHTTPServer(configFile string) {
 }
 
 func initRouter(cfg config.Config, lgr *zap.Logger) http.Handler {
+	userRepo := initRepository(cfg)
+	userService := initService(userRepo,cfg)
+	return router.NewRouter(lgr,userService)
+}
 
-	return router.NewRouter(lgr)
+func initService( userRepo user.UserRepository, cfg config.Config) (user.Service) {
+
+	userService := user.NewUserService(userRepo)
+
+	return userService
+}
+
+
+func initRepository(cfg config.Config) (user.UserRepository) {
+	dbConfig := cfg.GetDBConfig()
+	dbHandler := db.NewDBHandler(dbConfig)
+
+	db, err := dbHandler.GetDB()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	return user.NewUserRepository(db)
 }
 
 func initLogger(cfg config.Config) *zap.Logger {
